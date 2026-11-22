@@ -1,0 +1,175 @@
+:root {
+  color-scheme: dark;
+  --bg: #121313;
+  --ink: #f0efe9;
+  --mint: #9fffd3;
+  --muted: #a5a9a5;
+  --line: #343936;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+  --display: "Arial Black", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at 18% 0%, #1e2a25 0%, transparent 46%), var(--bg);
+  color: var(--ink);
+  font: 400 15px/1.5 "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+}
+button, select { font: inherit; color: inherit }
+button { cursor: pointer }
+button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid white; outline-offset: 4px }
+.topbar {
+  height: 65px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 max(24px, calc((100% - 1180px) / 2));
+  background: #101211bc;
+  border-bottom: 1px solid var(--line);
+}
+.brand { color: var(--ink); text-decoration: none; font: 900 italic 16px var(--display); white-space: nowrap }
+.brand span { color: var(--mint) }
+.brand .mark { font: normal 25px var(--mono); vertical-align: -2px; margin-right: 6px }
+.top-actions { display: flex; gap: 15px }
+.utility {
+  background: #171a19; border: 1px solid var(--line); padding: 7px 12px;
+  color: #d1d7d1; font: 12px var(--mono); border-radius: 2px;
+}
+.utility:hover { border-color: var(--mint); color: var(--mint) }
+.utility b { color: var(--mint) }
+.shell { width: min(1180px, calc(100% - 48px)); margin: 0 auto }
+.intro { padding: 41px 0 35px }
+.eyebrow, .section-note, .stage-head, footer, .match-info label {
+  font: 700 11px var(--mono); letter-spacing: .14em;
+}
+.eyebrow { color: var(--mint); display: flex; align-items: center; gap: 9px }
+.eyebrow i, .stage-head i, .card-copy i { display: inline-block; width: 7px; height: 7px; background: currentColor; transform: rotate(45deg) }
+h1 {
+  font: 950 italic clamp(39px, 8.8vw, 119px)/.96 var(--display);
+  letter-spacing: -.085em; margin: 8px 0 12px -4px; white-space: nowrap;
+}
+h1 em { color: var(--mint) }
+.intro p { margin: 0; color: #b6bdb7; font-size: 16px }
+.section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px }
+h2 { margin: 0; font: 900 italic 21px var(--display); letter-spacing: -.035em }
+.section-note { color: var(--muted) }
+.section-note b, footer b { color: var(--mint); margin: 0 4px }
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px }
+.card {
+  --accent: #9fffd3;
+  position: relative; min-width: 0; height: clamp(240px, 29vw, 355px);
+  display: flex; flex-direction: column; justify-content: space-between;
+  text-align: left; padding: 15px 17px; isolation: isolate; overflow: hidden;
+  border: 1px solid #414944; background: #131b18; border-radius: 2px;
+}
+.card.crab { --accent: #ffa96b; background: #211713 }
+.card.clip { --accent: #a5dcff; background: #151b21 }
+.card:hover { border-color: var(--accent) }
+.card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 24px color-mix(in srgb, var(--accent) 13%, transparent) }
+.portrait {
+  position: absolute; inset: 0; z-index: -2;
+  background: url(assets/roster.jpg) left 56% / 203% auto no-repeat;
+  transition: transform .25s ease;
+}
+.card:hover .portrait { transform: scale(1.04) }
+.crab .portrait { background-position: right 53% }
+.clip .portrait { background: url(assets/copilot.jpg) center 46% / cover no-repeat }
+.clip-logo { position: absolute; right: 17px; bottom: 15px; width: clamp(18px, 3vw, 36px); height: auto }
+.card::after {
+  position: absolute; content: ""; inset: 0; z-index: -1;
+  background: linear-gradient(180deg, #070a09aa, transparent 22%, transparent 47%, #080a09ee 100%);
+}
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: 5px; font: 700 11px var(--mono); color: var(--accent) }
+.selection { padding: 5px 8px; background: var(--accent); color: #101411; border-radius: 2px; visibility: hidden; letter-spacing: .04em }
+[aria-pressed="true"] .selection { visibility: visible }
+.card-copy { display: grid; gap: 6px }
+.card-copy strong { font: 950 italic clamp(22px, 3vw, 42px)/1 var(--display); letter-spacing: -.06em }
+.card-copy small { display: flex; align-items: center; gap: 8px; color: var(--accent); font: 700 10px var(--mono); letter-spacing: .12em }
+.card-copy i { width: 5px; height: 5px }
+.match-setup { display: flex; align-items: stretch; justify-content: space-between; gap: 12px; margin-top: 20px }
+.match-info { display: flex; align-items: center; gap: 12px; padding: 5px 14px; border: 1px solid var(--line); background: #151817 }
+.match-info label { color: var(--muted); white-space: nowrap }
+select { background: #151817; border: 0; padding: 5px; cursor: pointer; font-family: var(--mono); font-size: 12px }
+.primary {
+  display: inline-flex; justify-content: space-between; align-items: center;
+  gap: 22px; min-height: 47px; padding: 0 20px; border: 0; border-radius: 2px;
+  background: var(--mint); color: #111914; font: 900 italic 16px var(--display);
+}
+.primary:hover { background: #d5ffeb }
+.primary span { font: normal 21px var(--mono) }
+footer { margin: 25px 0 0; padding: 15px 0; display: flex; justify-content: space-between; gap: 8px; color: var(--muted); border-top: 1px solid var(--line) }
+.match { padding: 16px 0 28px }
+.stage-head { color: var(--mint); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px }
+.stage-actions { display: flex; gap: 6px }
+.stage-head i { margin-right: 6px }
+.stage { position: relative; background: #151b25; border: 1px solid var(--line); overflow: hidden }
+#arena { width: 100%; height: clamp(265px, 58vw, min(620px, 68vh)); display: block }
+.hud {
+  position: absolute; display: grid; grid-template-columns: 1fr 80px 1fr; align-items: start;
+  gap: 14px; inset: 13px 17px auto; pointer-events: none;
+}
+.fighter-name { font: 900 italic clamp(14px, 2.4vw, 28px)/1.15 var(--display); text-shadow: 2px 3px #101921 }
+.right { text-align: right }
+.health { height: 13px; background: #1a252c; border: 1px solid #b5c4c3; margin-top: 6px; display: flex }
+.right .health { justify-content: flex-end }
+.health span { width: 100%; background: var(--hp, var(--mint)); transition: width .16s; box-shadow: inset 0 -4px #0003 }
+.timer { display: grid; text-align: center; text-shadow: 2px 3px #101921 }
+.timer span { font: 900 italic clamp(28px, 4vw, 47px)/1 var(--display) }
+.timer small { font: 700 10px var(--mono); color: var(--mint); margin-top: 5px }
+.rounds { display: flex; gap: 6px; margin-top: 8px }
+.right .rounds { justify-content: flex-end }
+.rounds i { width: 9px; height: 9px; border: 1px solid #e1eee3; transform: rotate(45deg); background: #111a22 }
+.rounds .won { background: var(--hp, var(--mint)) }
+.banner {
+  position: absolute; top: 39%; left: 0; width: 100%; text-align: center; pointer-events: none;
+  font: 950 italic clamp(33px, 8vw, 92px)/1 var(--display); letter-spacing: -.06em; color: var(--mint);
+  text-shadow: 3px 4px #112920, 0 0 24px #000;
+}
+.result {
+  position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 12px;
+  background: #0b0f13ce; text-align: center;
+}
+.result h2 { font-size: clamp(30px, 7vw, 72px) }
+.fight-controls { margin-top: 13px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px }
+.pad { display: flex; gap: 5px }
+.pad button { min-width: 36px; padding: 7px; min-height: 39px; border: 1px solid var(--line); background: #1b211e; touch-action: none; font: 12px var(--mono); user-select: none }
+.pad button.active { color: #101914; background: var(--mint) }
+kbd { font: 12px var(--mono); color: var(--mint) }
+.pad button.active kbd { color: inherit }
+.pad button.cooldown { color: #b5bcb8; border-bottom-color: var(--meter, var(--mint)); background-image: linear-gradient(to right, #2f4c40 var(--charge), transparent var(--charge)) }
+dialog { width: min(470px, calc(100% - 32px)); background: #191d1b; color: var(--ink); padding: 23px; border: 1px solid var(--mint) }
+dialog::backdrop { background: #060a09b8 }
+.dialog-head { display: flex; justify-content: space-between; align-items: center }
+dl { display: grid; grid-template-columns: auto 1fr; gap: 10px; font-size: 13px }
+dd { margin: 0 }
+dialog p { color: var(--muted); margin: 18px 0 0; font-size: 13px }
+@media (max-width: 650px) {
+  .shell { width: calc(100% - 26px) }
+  .topbar { padding: 0 13px; height: 53px }
+  .top-actions { gap: 5px }
+  .top-actions .utility { padding: 6px }
+  .top-actions .utility span { font-size: 10px }
+  .intro { padding: 30px 0 26px }
+  h1 { margin-left: -2px }
+  .section-note { display: none }
+  .cards { gap: 6px }
+  .card { height: clamp(155px, 41vw, 252px); padding: 8px 6px }
+  .clip-logo { right: 6px; bottom: 8px }
+  .portrait { background-size: 280% auto }
+  .codex .portrait { background-position: 7% 44% }
+  .crab .portrait { background-position: 93% 48% }
+  .card-copy strong { font-size: clamp(15px, 4vw, 24px) }
+  .card-copy small { font-size: clamp(7px, 1.5vw, 10px); letter-spacing: 0; gap: 4px }
+  .selection { padding: 3px; font-size: 7px }
+  .match-info { padding: 4px 5px; gap: 3px }
+  .match-info label { font-size: 8px; letter-spacing: 0 }
+  .match-setup { gap: 6px }
+  .primary { gap: 8px; padding: 0 9px; font-size: 13px }
+  footer { font-size: 9px; letter-spacing: 0 }
+  .hud { grid-template-columns: 1fr 49px 1fr; gap: 7px; inset: 10px 9px auto }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important }
+}

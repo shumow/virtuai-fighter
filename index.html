@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <title>VirtuAI Fighter</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="arena.js"></script>
+  <script defer src="game.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="VirtuAI Fighter home"><span class="mark" aria-hidden="true">◈</span> VIRTU<span>AI</span> FIGHTER</a>
+    <div class="top-actions">
+      <button id="sound" class="utility" type="button" aria-pressed="true">♪ <span>Sound on</span></button>
+      <button id="help" class="utility" type="button"><b>?</b> <span>Controls</span></button>
+    </div>
+  </header>
+
+  <main id="menu" class="shell">
+    <section class="intro">
+      <div class="eyebrow"><i></i> LOCAL ARCADE</div>
+      <h1>VIRTU<em>AI</em> <span>FIGHTER</span></h1>
+      <p>AI mascots settle it in the ring.</p>
+    </section>
+
+    <section aria-labelledby="roster-heading" class="roster">
+      <div class="section-head">
+        <h2 id="roster-heading">SELECT YOUR FIGHTER</h2>
+        <span class="section-note">PLAYER 01 <b>/</b> FIGHTER SELECT</span>
+      </div>
+      <div class="cards" aria-label="Fighters">
+        <button class="card codex" type="button" data-fighter="0" aria-pressed="true">
+          <span class="portrait" aria-hidden="true"></span>
+          <span class="card-top"><span>01</span><span class="selection">P1 SELECTED</span></span>
+          <span class="card-copy"><strong>CODEX</strong><small><i></i> ALL-ROUNDER</small></span>
+        </button>
+        <button class="card crab" type="button" data-fighter="1" aria-pressed="false">
+          <span class="portrait" aria-hidden="true"></span>
+          <span class="card-top"><span>02</span><span class="selection">P1 SELECTED</span></span>
+          <span class="card-copy"><strong>CLAUDE CRAB</strong><small><i></i> HEAVYWEIGHT</small></span>
+        </button>
+        <button class="card clip" type="button" data-fighter="2" aria-pressed="false">
+          <span class="portrait" aria-hidden="true"></span>
+          <span class="card-top"><span>03</span><span class="selection">P1 SELECTED</span></span>
+          <span class="card-copy"><strong>COPILOT</strong><small><i></i> RUSHDOWN</small></span>
+          <img class="clip-logo" src="assets/copilot-logo.svg" alt="" width="36" height="34">
+        </button>
+      </div>
+      <div class="match-setup">
+        <div class="match-info">
+          <label for="rival">CPU RIVAL</label>
+          <select id="rival"></select>
+        </div>
+        <button id="start" class="primary" type="button">START FIGHT <span aria-hidden="true">↗</span></button>
+      </div>
+    </section>
+    <footer><span>01 / THE FOUNDRY</span><span>SOLO ARCADE <b>◆</b> BEST OF THREE</span></footer>
+  </main>
+
+  <main id="match" class="match shell" hidden>
+    <div class="stage-head">
+      <span><i></i> THE FOUNDRY</span>
+      <div class="stage-actions">
+        <button id="pause" class="utility" type="button">Pause</button>
+        <button id="exit" class="utility" type="button">← Fighter select</button>
+      </div>
+    </div>
+    <section class="stage" aria-label="3D fighting arena">
+      <canvas id="arena" aria-label="Live view of the fighters"></canvas>
+      <div class="hud">
+        <div class="status left">
+          <div class="fighter-name" id="p1name"></div>
+          <div class="health"><span id="p1hp"></span></div>
+          <div class="rounds" id="p1wins"></div>
+        </div>
+        <div class="timer"><span id="timer">45</span><small id="round">ROUND 1</small></div>
+        <div class="status right">
+          <div class="fighter-name" id="p2name"></div>
+          <div class="health"><span id="p2hp"></span></div>
+          <div class="rounds" id="p2wins"></div>
+        </div>
+      </div>
+      <div id="banner" class="banner" role="status" aria-live="polite"></div>
+      <div id="result" class="result" hidden>
+        <span class="eyebrow" id="result-detail"></span>
+        <h2 id="result-title"></h2>
+        <button id="rematch" class="primary" type="button">REMATCH <span aria-hidden="true">↗</span></button>
+        <button id="back" class="utility" type="button">Fighter select</button>
+      </div>
+    </section>
+    <div class="fight-controls" aria-label="Fight controls">
+      <div class="pad">
+        <button type="button" data-key="ArrowLeft" aria-label="Move left">←</button>
+        <button type="button" data-key="ArrowUp" aria-label="Sidestep back">↑</button>
+        <button type="button" data-key="ArrowDown" aria-label="Sidestep forward">↓</button>
+        <button type="button" data-key="ArrowRight" aria-label="Move right">→</button>
+      </div>
+      <div class="pad actions">
+        <button type="button" data-key="KeyJ"><kbd>J</kbd> Strike</button>
+        <button type="button" data-key="KeyK"><kbd>K</kbd> Heavy</button>
+        <button id="special" type="button" data-key="KeyL"><kbd>L</kbd> <span>Special</span></button>
+        <button type="button" data-key="Space"><kbd>␣</kbd> Guard</button>
+      </div>
+    </div>
+  </main>
+
+  <dialog id="controls">
+    <div class="dialog-head"><h2>CONTROLS</h2><button id="close-help" class="utility" type="button" aria-label="Close controls">✕</button></div>
+    <dl>
+      <dt><kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd></dt><dd>Move left and right</dd>
+      <dt><kbd>↑</kbd> <kbd>↓</kbd> or <kbd>W</kbd> <kbd>S</kbd></dt><dd>Sidestep in 3D</dd>
+      <dt><kbd>J</kbd></dt><dd>Quick strike</dd>
+      <dt><kbd>K</kbd></dt><dd>Heavy attack</dd>
+      <dt><kbd>L</kbd></dt><dd>Fighter special, with a cooldown</dd>
+      <dt><kbd>Space</kbd></dt><dd>Hold to guard</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Pause or resume</dd>
+    </dl>
+    <p>Win two rounds by knockout, ring out, or having more health when time expires.</p>
+  </dialog>
+</body>
+</html>
