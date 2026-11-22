@@ -16,11 +16,8 @@ const standard = {
   quick: { damage: 10, windup: .11, duration: .32, reach: 1.55, shove: .28, lunge: .12 },
   heavy: { damage: 20, windup: .26, duration: .59, reach: 1.79, shove: .78, lunge: .28 },
 };
-const buttons = { KeyJ: "quick", KeyK: "heavy", KeyL: "special" };
-const movement = {
-  ArrowLeft: [-1,0], KeyA: [-1,0], ArrowRight: [1,0], KeyD: [1,0],
-  ArrowUp: [0,-1], KeyW: [0,-1], ArrowDown: [0,1], KeyS: [0,1],
-};
+const buttons = { KeyA: "quick", KeyS: "heavy", KeyD: "special" };
+const fightKeys = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Space", ...Object.keys(buttons)]);
 const $ = id => document.getElementById(id);
 const menu = $("menu"), match = $("match"), rival = $("rival"), controls = $("controls");
 const stage = new Arena($("arena"));
@@ -268,8 +265,8 @@ function held(code) {
 }
 function playerTick(fighter, opponent, dt) {
   fighter.guard = held("Space") && !fighter.attack && fighter.stun <= 0;
-  const x = Number(held("ArrowRight") || held("KeyD")) - Number(held("ArrowLeft") || held("KeyA"));
-  const z = Number(held("ArrowDown") || held("KeyS")) - Number(held("ArrowUp") || held("KeyW"));
+  const x = Number(held("ArrowRight")) - Number(held("ArrowLeft"));
+  const z = Number(held("ArrowDown")) - Number(held("ArrowUp"));
   move(fighter, x, z, dt);
   if (queued && worldTime > queued.expires) queued = null;
   if (queued && beginAttack(fighter, queued.kind, opponent, z)) queued = null;
@@ -450,7 +447,7 @@ window.addEventListener("keydown", event => {
   if (phase === "menu" || controls.open || event.altKey || event.metaKey || event.ctrlKey) return;
   if (event.code === "Escape" && !event.repeat) togglePause();
   const { code } = event;
-  if (phase === "result" || !["Space", ...Object.keys(movement), ...Object.keys(buttons)].includes(code)) return;
+  if (phase === "result" || !fightKeys.has(code)) return;
   if (code === "Space" && event.target.closest("button") && event.target !== $("exit") && event.target.dataset.key === undefined) return;
   event.preventDefault();
   if (!event.repeat) queueAttack(code);
