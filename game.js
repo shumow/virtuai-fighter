@@ -7,6 +7,10 @@ const roster = [
     special: { name: "Claw Clamp", damage: 31, windup: .38, duration: .85, reach: 2.48, shove: 1.35, lunge: .31 } },
   { name: "Copilot", color: "#a5dcff", speed: 3.62, weight: .85, power: .89,
     special: { name: "Paperclip Rocket", damage: 25, windup: .20, duration: .64, reach: 2.88, shove: .72, lunge: 1.18 } },
+  { name: "Gemini", color: "#c2aaff", speed: 3.26, weight: .93, power: .95,
+    quick: { reach: 1.68 },
+    heavy: { damage: 17, windup: .33, duration: .71, reach: 1.93, shove: 1.26 },
+    special: { name: "Parallax", damage: 24, windup: .29, duration: .82, reach: 1.84, shove: .86, lunge: .44, sidestep: 1.18 } },
 ];
 const standard = {
   quick: { damage: 10, windup: .11, duration: .32, reach: 1.55, shove: .28, lunge: .12 },
@@ -95,6 +99,7 @@ function resetFighter(id, side, wins = 0) {
   return {
     id, wins, health: 100, x: side * 1.70, z: side * -.17, angle: -side * Math.PI * .47,
     attack: null, cooldown: 0, stun: 0, guard: false, moving: false, fall: 0, ko: false,
+    nextTwin: -1,
   };
 }
 function setBanner(message) {
@@ -228,11 +233,27 @@ function move(fighter, x, z, dt) {
   fighter.z += z * speed;
   fighter.moving = true;
 }
-function beginAttack(fighter, kind) {
+function beginAttack(fighter, kind, target, step = 0) {
   if (!kind || fighter.attack || fighter.stun > 0 || fighter.guard) return false;
   if (kind === "special" && fighter.cooldown > 0) return false;
-  const data = kind === "special" ? roster[fighter.id].special : standard[kind];
-  fighter.attack = { ...data, kind, elapsed: 0, resolved: false, angle: fighter.angle };
+  const profile = roster[fighter.id];
+  const data = { ...standard[kind], ...profile[kind] };
+  const attack = { ...data, kind, elapsed: 0, resolved: false, angle: fighter.angle };
+  fighter.attack = attack;
+  if (kind === "quick" && profile.quick) {
+    attack.twin = fighter.nextTwin;
+    fighter.nextTwin *= -1;
+  }
+  if (attack.sidestep) {
+    const rightX = Math.cos(attack.angle), rightZ = -Math.sin(attack.angle);
+    const towardCenter = -(fighter.x * rightX / 5.5 + fighter.z * rightZ / 3.5);
+    const side = Math.sign(step * rightZ || towardCenter) || 1;
+    attack.stepX = rightX * side * attack.sidestep;
+    attack.stepZ = rightZ * side * attack.sidestep;
+    attack.aimX = target.x;
+    attack.aimZ = target.z;
+    attack.twin = side;
+  }
   if (kind === "special") {
     fighter.cooldown = specialCooldown;
     tone(240, 580, .075, data.windup, "triangle");
@@ -245,13 +266,13 @@ function updatePad() {
 function held(code) {
   return pressed.has(code) || [...pointerKeys.values()].includes(code);
 }
-function playerTick(fighter, dt) {
+function playerTick(fighter, opponent, dt) {
   fighter.guard = held("Space") && !fighter.attack && fighter.stun <= 0;
   const x = Number(held("ArrowRight") || held("KeyD")) - Number(held("ArrowLeft") || held("KeyA"));
   const z = Number(held("ArrowDown") || held("KeyS")) - Number(held("ArrowUp") || held("KeyW"));
   move(fighter, x, z, dt);
   if (queued && worldTime > queued.expires) queued = null;
-  if (queued && beginAttack(fighter, queued.kind)) queued = null;
+  if (queued && beginAttack(fighter, queued.kind, opponent, z)) queued = null;
 }
 function cpuTick(cpu, player, dt) {
   const direction = distance(cpu, player);
@@ -263,6 +284,8 @@ function cpuTick(cpu, player, dt) {
     if (edge && direction.length > 1.9) brain.intent = "center";
     else if (direction.length > 2.35) {
       brain.intent = direction.length < 2.85 && cpu.id === 2 && roll < .34 ? "special" : "approach";
+    } else if (cpu.id === 3 && player.attack && !player.attack.resolved && cpu.cooldown <= 0 && roll < .64) {
+      brain.intent = "special";
     } else if (player.attack && roll < .42) brain.intent = "guard";
     else if (direction.length > 1.55 && roll < .43) brain.intent = "approach";
     else if (roll < .16) brain.intent = "step";
@@ -277,7 +300,7 @@ function cpuTick(cpu, player, dt) {
   else if (brain.intent === "center") move(cpu, -cpu.x, -cpu.z, dt);
   else {
     cpu.moving = false;
-    if (["quick", "heavy", "special"].includes(brain.intent) && beginAttack(cpu, brain.intent)) {
+    if (["quick", "heavy", "special"].includes(brain.intent) && beginAttack(cpu, brain.intent, player)) {
       brain.intent = "wait";
       brain.time = cpu.attack.duration + .08 + Math.random() * .25;
     }
@@ -291,11 +314,22 @@ function attackTick(attacker, target, dt) {
   const advance = Math.min(attack.elapsed, attack.windup) - Math.min(before, attack.windup);
   attacker.x += Math.sin(attack.angle) * attack.lunge * advance / attack.windup;
   attacker.z += Math.cos(attack.angle) * attack.lunge * advance / attack.windup;
+  if (attack.sidestep && !attack.resolved) {
+    // Sell the feint first, then move most of the way before the counter lands.
+    const slide = time => Math.max(0, Math.min(1, (time / attack.windup - .22) / .78));
+    const fraction = slide(attack.elapsed) - slide(before);
+    attacker.x += attack.stepX * fraction;
+    attacker.z += attack.stepZ * fraction;
+  }
   if (attack.resolved || attack.elapsed < attack.windup) {
     if (attack.elapsed >= attack.duration) attacker.attack = null;
     return null;
   }
   attack.resolved = true;
+  if (attack.sidestep) {
+    attack.angle = Math.atan2(attack.aimX - attacker.x, attack.aimZ - attacker.z);
+    attacker.angle = attack.angle;
+  }
   const direction = distance(attacker, target);
   const alignment = direction.x * Math.sin(attack.angle) + direction.z * Math.cos(attack.angle);
   const reach = attack.reach + (attacker.id === 1 && attack.kind !== "special" ? .14 : 0);
@@ -370,7 +404,7 @@ function simulate(dt) {
     fighter.stun = Math.max(0, fighter.stun - dt);
     if (!fighter.attack) fighter.angle = Math.atan2(other.x - fighter.x, other.z - fighter.z);
   }
-  playerTick(player, dt);
+  playerTick(player, cpu, dt);
   cpuTick(cpu, player, dt);
   const hits = [attackTick(player, cpu, dt), attackTick(cpu, player, dt)];
   for (const hit of hits) if (hit) land(hit);

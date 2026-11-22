@@ -276,6 +276,7 @@ class Arena {
     if (fighter.id === 0) this.robot(transform, pose);
     if (fighter.id === 1) this.crab(transform, pose);
     if (fighter.id === 2) this.paperclip(transform, pose);
+    if (fighter.id === 3) this.gemini(transform, pose, attack, time);
   }
 
   robot(t, { bob, gait, extent, guard, heavy, special, flash }) {
@@ -399,6 +400,61 @@ class Arena {
         t([badgeX, hy + .105, hz + sign * .112]),
         t([badgeX, hy + .105, hz - sign * .112]),
         t([badgeX, hy - .105, hz + sign * .112]));
+    }
+  }
+
+  gemini(t, { bob, extent, guard, heavy, special, flash }, attack, time) {
+    const orbit = Math.sin(time * 3.5);
+    const coreY = 1.34 + bob * 2;
+    const track = (angle, radius) => {
+      const x = Math.cos(angle) * radius;
+      return t([x, coreY + Math.sin(angle) * radius, x * .61 - .07]);
+    };
+    for (let i = 0; i < 16; i++) {
+      if (i % 4 === 3) continue;
+      const start = i * Math.PI / 8, end = start + Math.PI / 8;
+      this.polygon([track(start,.56),track(end,.56),track(end,.517),track(start,.517)],
+        i < 4 || i >= 12 ? "#9473d4" : "#4b90dd");
+    }
+    const rim = [[0,.42],[.10,.11],[.33,0],[.10,-.11],[0,-.42],[-.10,-.11],[-.33,0],[-.10,.11]];
+    const corners = rim.map(([x,y]) => t([x,coreY+y,0]));
+    const front = t([0,coreY,.17]);
+    const back = t([0,coreY,-.17]);
+    const facets = ["#edf9ff", "#a8e4ff", "#b19bff", "#7565f1"];
+    for (let i = 0; i < corners.length; i++) {
+      const a = corners[i], b = corners[(i + 1) % corners.length];
+      this.mesh([front, a, b], [[0,2,1]], facets[i % 4], true);
+      this.mesh([back, a, b], [[0,1,2]], facets[(i + 2) % 4], true);
+    }
+
+    const feint = special && !attack.resolved ? Math.sin(Math.PI * attack.elapsed / attack.windup) : 0;
+    for (const sign of [-1, 1]) {
+      const shell = flash ? "#eceaff" : sign < 0 ? "#4779df" : "#9c63df";
+      const trim = sign < 0 ? "#91dfff" : "#edc5ff";
+      const frame = "#30334a";
+      const striking = heavy || attack?.twin === sign;
+      const extension = striking ? extent : feint * .58;
+      const x = sign * (.45 + orbit * .045);
+      const y = coreY + .19 + sign * (.13 + orbit * .064);
+      const z = sign * (.29 + orbit * .052) + extension * .30;
+      this.prism(t, [
+        [y - .24, x, z + .025, .11, .13, .045],
+        [y - .10, x, z, .21, .18, .055],
+        [y + .15, x, z, .218, .175, .050],
+        [y + .24, x, z - .02, .15, .13, .040],
+      ], shell);
+      this.box(t, x,y+.035,z+.171,.34,.105,.058,frame,.018);
+      this.box(t, x,y+.043,z+.203,.247,.029,.013,trim,.005,true);
+      this.box(t, x+sign*.214,y+.02,z-.014,.062,.19,.22,frame,.022);
+      this.box(t, x+sign*.25,y+.045,z-.014,.019,.07,.12,trim,.007,true);
+
+      const braced = guard || (attack && !striking && !feint);
+      const gloveX = sign * (braced ? .31 : .48 - Math.max(0, extension) * .13);
+      const gloveY = y - (braced ? .21 : .48) + extension * .11;
+      const gloveZ = z + .37 + extension * (special ? .77 : .58);
+      this.box(t,gloveX,gloveY,gloveZ,.31,.28,.36,shell,.069);
+      this.box(t,gloveX,gloveY,gloveZ+.174,.24,.17,.044,frame,.028);
+      this.box(t,gloveX,gloveY+.01,gloveZ+.202,.145,.048,.014,trim,.010,true);
     }
   }
 
