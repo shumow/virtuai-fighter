@@ -2,7 +2,11 @@
 
 VirtuAI Fighter is a 3D arcade fighting game for the browser. Pick Codex, Claude Crab, Copilot, or Gemini and face a CPU rival in The Foundry.
 
-## Play the alpha
+## Play in your browser
+
+Open [VirtuAI Fighter on GitHub Pages](https://shumow.github.io/virtuai-fighter/), select your fighter and a **CPU Rival**, then click **Start Fight**.
+
+## Play offline
 
 1. Open the [v0.1.0-alpha.1 release](https://github.com/shumow/virtuai-fighter/releases/tag/v0.1.0-alpha.1) and download **VirtuAI-Fighter-v0.1.0-alpha.1.zip** from **Assets**.
 2. Extract the ZIP, then open `VirtuAI-Fighter/index.html` in your browser. The extracted game runs offline without an install or a server.
