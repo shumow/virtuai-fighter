@@ -1,0 +1,29 @@
+# VirtuAI Fighter
+
+VirtuAI Fighter is a 3D arcade fighting game for the browser. Pick Codex, Claude Crab, Copilot, or Gemini and face a CPU rival in The Foundry.
+
+## Play the alpha
+
+1. Open the [v0.1.0-alpha.1 release](https://github.com/shumow/virtuai-fighter/releases/tag/v0.1.0-alpha.1) and download **VirtuAI-Fighter-v0.1.0-alpha.1.zip** from **Assets**.
+2. Extract the ZIP, then open `VirtuAI-Fighter/index.html` in your browser. The extracted game runs offline without an install or a server.
+3. Select your fighter, choose a **CPU Rival**, and click **Start Fight**.
+
+If you already have this repository checked out, open `index.html` from the checkout.
+
+## Controls
+
+| Key | Action |
+| --- | --- |
+| **← / →** | Move left or right |
+| **↑ / ↓** | Sidestep away from or toward the camera |
+| **A** | Quick strike |
+| **S** | Heavy attack |
+| **D** | Fighter special, with a cooldown |
+| **Space** | Hold to guard |
+| **Esc** | Pause or resume |
+
+The buttons below the arena also work with a mouse or touchscreen. As Gemini, hold **↑** or **↓** while pressing **D** to choose the direction of Parallax’s sidestep.
+
+## Win the match
+
+Win two 45-second rounds. Take out your rival’s health, knock them off the platform, or finish the round with more health when time expires. A drawn round is replayed. After the match, choose **Rematch** or return to fighter select.
