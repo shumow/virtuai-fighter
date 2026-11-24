@@ -1,15 +1,39 @@
-# Training mode and local versus
+# VirtuAI Fighter development plan
 
-Ship Training first so players can learn the four fighters and give specific feedback about attack range, timing, and ring-outs. Ship local versus after that so two people can test the same matchups without the CPU influencing the result.
+Ship landscape phone controls first so players can finish a match on a touchscreen. Follow with Training for learning attack timing and ring-outs, then local versus for testing matchups between two human players.
 
 | Milestone | Proposed release | Completion criterion |
 | --- | --- | --- |
-| Training | `v0.1.0-alpha.2` | Every fighter can practice against an idle, guarding, or attacking dummy and reset the drill without returning to the menu. |
-| Local versus | `v0.1.0-alpha.3` | Two people can select fighters, finish a best-of-three match on one keyboard, and rematch. |
+| Landscape phone controls | `v0.1.0-alpha.2` | Players can select a fighter, finish a Solo Arcade match, and rematch entirely by touch in landscape. |
+| Training | `v0.1.0-alpha.3` | Every fighter can practice against an idle, guarding, or attacking dummy and reset the drill without returning to the menu. |
+| Local versus | `v0.1.0-alpha.4` | Two people can select fighters, finish a best-of-three match on one keyboard, and rematch. |
 
-Both milestones use the existing roster, Foundry arena, and offline browser entry point. Leave online play, controller support, recorded dummy inputs, and key rebinding for later releases.
+All three milestones use the existing roster, Foundry arena, and offline browser entry point. Leave online play, controller support, recorded dummy inputs, and key rebinding for later releases.
 
-## Milestone 1 · Training mode
+## Milestone 1 · Landscape phone controls
+
+### Player flow
+
+1. Open the GitHub Pages build on a phone and pick a fighter and CPU rival in either orientation. On portrait touch screens, show a short **Rotate for landscape play** hint.
+2. Start a match in landscape. Use a left-thumb directional pad for movement and sidesteps and a right-thumb cluster for **Strike**, **Heavy**, **Special**, and **Guard**. Keep the special cooldown visible on its button.
+3. Hold a direction while tapping an attack or holding Guard. To direct Gemini’s Parallax, hold **↑** or **↓** with the left thumb and tap **Special** with the right.
+4. Keep **Pause**, **Resume**, **Fighter Select**, and **Rematch** reachable by touch. If the phone rotates during a fight, clear held inputs and pause. Let the player resume explicitly when ready.
+
+### Implementation order
+
+1. In [index.html](../index.html) and [style.css](../style.css), rearrange the existing on-screen buttons into two thumb clusters for short landscape viewports with touch input. Keep tap targets at least 44 × 44 CSS pixels. Reserve space for the clusters so neither covers the health bars, timer, or normal fighting area.
+2. Fit the match to the usable viewport height, including browser bars and safe-area insets on both sides. Reduce vertical spacing in the match header and HUD as needed. Keep fighter select and the Controls dialog scrollable. Preserve playback in the browser without requiring fullscreen or orientation lock.
+3. In [game.js](../game.js), build on the existing per-pointer bookkeeping and shared keyboard/touch action map. Confirm that a second touch leaves the first active and releasing one pointer affects only its action. Clear active inputs and the attack queue on cancellation, orientation changes, pause, focus loss, and match transitions. Limit gesture suppression to the controls.
+4. Update the Controls dialog and README with the landscape layout and Gemini’s two-thumb input. Publish the mobile alpha and test the same build on GitHub Pages.
+
+### Acceptance checks
+
+- On a physical iPhone in Safari and an Android phone in Chrome, play from fighter select through a match result and rematch without a keyboard. Use browser bars in their expanded and collapsed states. At a compact landscape size such as 568 × 320 CSS pixels, verify that the arena, HUD, and touch controls fit without scrolling during combat.
+- Hold movement while tapping each attack, hold Guard and release it, and trigger Parallax in both directions. Lift one thumb while the other is held and verify the remaining input stays active.
+- Start a held input, then rotate, switch apps, or pause. Return and verify there is no stuck movement, guard, or queued strike. Check that browser scrolling still works in the roster and Controls dialog.
+- Verify the desktop layout and arrow, A/S/D, Space, and Esc bindings still behave as in alpha.1.
+
+## Milestone 2 · Training mode
 
 ### Player flow
 
@@ -43,9 +67,10 @@ On a knockout or ring-out, show the usual outcome briefly, then restore both fig
 - Practice Gemini’s Parallax with **↑ + D** and **↓ + D** against each repeated attack. Check that each attempt follows the same timing as in Arcade and that a whiff leaves Gemini open.
 - Confirm that Repeat Attack respects recovery and the real special cooldown. Pause during the delay, resume, and check that the dummy waits for the remaining time.
 - Cause a knockout and a ring-out. Verify the game returns to practice automatically without changing settings.
+- On a phone in landscape, change dummy settings, reset the drill, and use the two-thumb controls. Verify that setup controls leave room for the fight controls.
 - Play an Arcade match to verify the timer, scoring, pause, and rematch still work.
 
-## Milestone 2 · Local two-player versus
+## Milestone 3 · Local two-player versus
 
 ### Player flow
 
@@ -80,4 +105,4 @@ Escape pauses both players. Show both layouts before a fight and in Controls. Fo
 
 ## Release verification
 
-For each milestone, verify key gameplay paths in a desktop browser and check that the extracted release ZIP opens offline. Check the Training UI at narrow widths as well as desktop widths. Include the new controls and feedback prompts in the release notes. Ask testers to name the fighter, matchup, and move involved when reporting unclear hits, failed sidesteps, or unexpected ring-outs.
+For each milestone, verify the live GitHub Pages build and check that the extracted release ZIP opens offline. Include the new controls and feedback prompts in the release notes. Ask testers to name the fighter, matchup, and move involved when reporting unclear hits, failed sidesteps, or unexpected ring-outs. For touch layout or input reports, ask for the phone model, browser, and orientation.
