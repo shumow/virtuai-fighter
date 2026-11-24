@@ -1,5 +1,7 @@
 # VirtuAI Fighter
 
+[![Play VirtuAI Fighter — Codex faces Claude Crab](assets/roster.jpg)](https://shumow.github.io/virtuai-fighter/)
+
 VirtuAI Fighter is a 3D arcade fighting game for the browser. Pick Codex, Claude Crab, Copilot, or Gemini and face a CPU rival in The Foundry.
 
 ## Play in your browser
