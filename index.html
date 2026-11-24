@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#111111">
   <title>VirtuAI Fighter</title>
   <link rel="stylesheet" href="style.css">
@@ -23,6 +23,7 @@
       <div class="eyebrow"><i></i> LOCAL ARCADE</div>
       <h1>VIRTU<em>AI</em> <span>FIGHTER</span></h1>
       <p>AI mascots settle it in the ring.</p>
+      <p class="rotate-hint">Rotate your phone for landscape play.</p>
     </section>
 
     <section aria-labelledby="roster-heading" class="roster">
@@ -95,14 +96,14 @@
         <button id="back" class="utility" type="button">Fighter select</button>
       </div>
     </section>
-    <div class="fight-controls" aria-label="Fight controls">
-      <div class="pad">
+    <div class="fight-controls">
+      <div class="pad movement" role="group" aria-label="Movement">
         <button type="button" data-key="ArrowLeft" aria-label="Move left">←</button>
         <button type="button" data-key="ArrowUp" aria-label="Sidestep back">↑</button>
         <button type="button" data-key="ArrowDown" aria-label="Sidestep forward">↓</button>
         <button type="button" data-key="ArrowRight" aria-label="Move right">→</button>
       </div>
-      <div class="pad actions">
+      <div class="pad actions" role="group" aria-label="Combat">
         <button type="button" data-key="KeyA"><kbd>A</kbd> Strike</button>
         <button type="button" data-key="KeyS"><kbd>S</kbd> Heavy</button>
         <button id="special" type="button" data-key="KeyD"><kbd>D</kbd> <span>Special</span></button>
@@ -122,7 +123,8 @@
       <dt><kbd>Space</kbd></dt><dd>Hold to guard</dd>
       <dt><kbd>Esc</kbd></dt><dd>Pause or resume</dd>
     </dl>
-    <p>As Gemini, hold ↑ or ↓ and press D to choose the direction of Parallax’s sidestep.</p>
+    <p>On a phone, turn to landscape and use your left thumb to move and your right thumb to attack or guard.</p>
+    <p>As Gemini, hold ↑ or ↓ and press D or tap Special to choose the direction of Parallax’s sidestep.</p>
     <p>Win two rounds by knockout, ring out, or having more health when time expires.</p>
   </dialog>
 </body>

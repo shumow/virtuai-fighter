@@ -5,6 +5,10 @@
   --mint: #9fffd3;
   --muted: #a5a9a5;
   --line: #343936;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
   --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
   --display: "Arial Black", "Helvetica Neue", Arial, sans-serif;
 }
@@ -16,16 +20,20 @@ body {
   color: var(--ink);
   font: 400 15px/1.5 "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
+  min-height: 100dvh;
+  padding-bottom: var(--safe-bottom);
 }
 button, select { font: inherit; color: inherit }
 button { cursor: pointer }
 button:focus-visible, select:focus-visible, a:focus-visible { outline: 2px solid white; outline-offset: 4px }
 .topbar {
-  height: 65px;
+  height: calc(65px + var(--safe-top));
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 max(24px, calc((100% - 1180px) / 2));
+  padding-top: var(--safe-top);
+  padding-left: max(24px, var(--safe-left), calc((100% - 1180px) / 2));
+  padding-right: max(24px, var(--safe-right), calc((100% - 1180px) / 2));
   background: #101211bc;
   border-bottom: 1px solid var(--line);
 }
@@ -52,6 +60,7 @@ h1 {
 }
 h1 em { color: var(--mint) }
 .intro p { margin: 0; color: #b6bdb7; font-size: 16px }
+.intro .rotate-hint { display: none; color: var(--mint); margin-top: 8px; font-size: 13px }
 .section-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 11px }
 h2 { margin: 0; font: 900 italic 21px var(--display); letter-spacing: -.035em }
 .section-note { color: var(--muted) }
@@ -136,12 +145,12 @@ footer { margin: 25px 0 0; padding: 15px 0; display: flex; justify-content: spac
 .result h2 { font-size: clamp(30px, 7vw, 72px) }
 .fight-controls { margin-top: 13px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px }
 .pad { display: flex; gap: 5px }
-.pad button { min-width: 36px; padding: 7px; min-height: 39px; border: 1px solid var(--line); background: #1b211e; touch-action: none; font: 12px var(--mono); user-select: none }
+.pad button { min-width: 36px; padding: 7px; min-height: 39px; border: 1px solid var(--line); background: #1b211e; touch-action: none; font: 12px var(--mono); user-select: none; -webkit-touch-callout: none }
 .pad button.active { color: #101914; background: var(--mint) }
 kbd { font: 12px var(--mono); color: var(--mint) }
 .pad button.active kbd { color: inherit }
 .pad button.cooldown { color: #b5bcb8; border-bottom-color: var(--meter, var(--mint)); background-image: linear-gradient(to right, #2f4c40 var(--charge), transparent var(--charge)) }
-dialog { width: min(470px, calc(100% - 32px)); background: #191d1b; color: var(--ink); padding: 23px; border: 1px solid var(--mint) }
+dialog { width: min(470px, calc(100% - max(32px, var(--safe-left) + var(--safe-right)))); background: #191d1b; color: var(--ink); padding: 23px; border: 1px solid var(--mint); overflow: auto }
 dialog::backdrop { background: #060a09b8 }
 .dialog-head { display: flex; justify-content: space-between; align-items: center }
 dl { display: grid; grid-template-columns: auto 1fr; gap: 10px; font-size: 13px }
@@ -152,7 +161,7 @@ dialog p { color: var(--muted); margin: 18px 0 0; font-size: 13px }
 }
 @media (max-width: 650px) {
   .shell { width: calc(100% - 26px) }
-  .topbar { padding: 0 13px; height: 53px }
+  .topbar { padding-inline: max(13px, var(--safe-left)) max(13px, var(--safe-right)); height: calc(53px + var(--safe-top)) }
   .top-actions { gap: 5px }
   .top-actions .utility { padding: 6px }
   .top-actions .utility span { font-size: 10px }
@@ -174,6 +183,77 @@ dialog p { color: var(--muted); margin: 18px 0 0; font-size: 13px }
   .primary { gap: 8px; padding: 0 9px; font-size: 13px }
   footer { font-size: 9px; letter-spacing: 0 }
   .hud { grid-template-columns: 1fr 49px 1fr; gap: 7px; inset: 10px 9px auto }
+}
+@media (orientation: portrait) and (any-pointer: coarse) and (max-width: 600px) {
+  .intro .rotate-hint { display: block }
+}
+@media (orientation: landscape) and (any-pointer: coarse) and (max-height: 500px) {
+  #menu { width: min(1180px, 100%); padding-inline: max(8px, var(--safe-left)) max(8px, var(--safe-right)) }
+  .intro { padding: 12px 0 10px }
+  .intro h1 { font-size: clamp(36px, 7vw, 66px); margin: 4px 0 5px }
+  .intro p { font-size: 13px }
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px }
+  .card { height: clamp(134px, 46dvh, 210px); padding: 8px }
+  .card-copy strong { font-size: clamp(14px, 2.6vw, 27px) }
+  .match-setup { margin-top: 10px }
+  .topbar {
+    --toolbar: 45px;
+    height: calc(var(--toolbar) + var(--safe-top));
+    padding-inline: max(8px, var(--safe-left)) max(8px, var(--safe-right));
+  }
+  .topbar .utility { min-height: 44px }
+  .match {
+    --control: clamp(44px, min(7.4vw, 15vh), 60px);
+    --control: clamp(44px, min(7.4vw, 15dvh), 60px);
+    --gutter: 4px;
+    display: grid;
+    grid-template: auto minmax(0, 1fr) / auto minmax(0, 1fr) auto;
+    column-gap: 8px;
+    width: min(1180px, 100%);
+    height: calc(100vh - 45px - var(--safe-top) - var(--safe-bottom));
+    height: calc(100dvh - 45px - var(--safe-top) - var(--safe-bottom));
+    min-height: calc(45px + 3 * var(--control) + 2 * var(--gutter) + 4px);
+    padding: 0 max(8px, var(--safe-right)) 4px max(8px, var(--safe-left));
+  }
+  .stage-head { grid-area: 1 / 1 / 2 / -1; margin: 0; min-width: 0 }
+  .stage-actions .utility { min-height: 44px }
+  .stage { grid-area: 2 / 2; min-width: 0; min-height: 0 }
+  #arena { width: 100%; height: 100% }
+  .hud { grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr); gap: 5px; inset: 7px 7px auto }
+  .fighter-name { font-size: clamp(10px, 1.8vw, 16px); overflow-wrap: anywhere }
+  .health { height: 8px; margin-top: 4px }
+  .timer span { font-size: 23px }
+  .timer small { font-size: 8px; margin-top: 3px }
+  .rounds { margin-top: 5px }
+  .rounds i { width: 6px; height: 6px }
+  .banner { top: 46%; font-size: clamp(21px, 5vw, 46px) }
+  .result { gap: 4px; padding: 3px }
+  .result .eyebrow { font-size: 8px; letter-spacing: .05em }
+  .result h2 { font-size: clamp(21px, 5vw, 40px) }
+  .result .utility { min-height: 44px }
+  .fight-controls { display: contents }
+  .pad {
+    display: grid;
+    gap: var(--gutter);
+    align-self: end;
+  }
+  .pad button { min-width: 0; min-height: var(--control); padding: 3px; border-radius: 5px }
+  .movement {
+    grid-area: 2 / 1;
+    grid-template-areas: ". up ." "left . right" ". down .";
+    grid-template-columns: repeat(3, var(--control));
+    grid-template-rows: repeat(3, var(--control));
+  }
+  .movement button { font-size: 21px }
+  .movement button[data-key="ArrowUp"] { grid-area: up }
+  .movement button[data-key="ArrowLeft"] { grid-area: left }
+  .movement button[data-key="ArrowRight"] { grid-area: right }
+  .movement button[data-key="ArrowDown"] { grid-area: down }
+  .actions { grid-area: 2 / 3; grid-template-columns: repeat(2, max(46px, var(--control))); margin-bottom: 9px }
+  .actions button { font-size: 10px; font-weight: 700 }
+  .actions kbd { display: none }
+  dialog { max-height: calc(100dvh - max(16px, var(--safe-top) + var(--safe-bottom))); padding: 11px 15px }
+  #close-help { min-width: 44px; min-height: 44px }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important }

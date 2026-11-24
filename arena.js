@@ -469,8 +469,10 @@ class Arena {
       this.canvas.height = height;
     }
     this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    this.focal = Math.min(this.width * .91, this.height * 1.29);
-    const target = Math.max(-2.4, Math.min(2.4, (fighters[0].x + fighters[1].x) / 2));
+    const compact = this.width < 420;
+    this.focal = Math.min(this.width * (compact ? .80 : .91), this.height * 1.29);
+    // Keep both ring edges visible when the touch controls leave a narrow canvas.
+    const target = compact ? 0 : Math.max(-2.4, Math.min(2.4, (fighters[0].x + fighters[1].x) / 2));
     this.cameraX += (target - this.cameraX) * .095;
     this.scenery(time);
     for (const fighter of fighters) this.shadow(fighter);

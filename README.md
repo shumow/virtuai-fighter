@@ -28,7 +28,9 @@ If you already have this repository checked out, open `index.html` from the chec
 | **Space** | Hold to guard |
 | **Esc** | Pause or resume |
 
-The buttons below the arena also work with a mouse or touchscreen. As Gemini, hold **↑** or **↓** while pressing **D** to choose the direction of Parallax’s sidestep.
+On the alpha.2 build, turn your phone to landscape. Use the directional pad with your left thumb and tap **Strike**, **Heavy**, or **Special** with your right. Hold **Guard** to block. Rotating the phone during a fight pauses it until you tap **Resume**.
+
+As Gemini, hold **↑** or **↓** while pressing **D** or tapping **Special** to choose the direction of Parallax’s sidestep.
 
 ## Win the match
 

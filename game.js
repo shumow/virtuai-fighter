@@ -36,6 +36,7 @@ let clock = 45, round = 1, phase = "menu", phaseTime = 0, pause = false;
 let worldTime = 0, lastFrame = 0, animation = 0, banner = "";
 let brain = { time: 0, intent: "approach", step: 1 };
 let audio, sound = stored.get("virtuai-sound") !== "off";
+let pausedForHelp = false;
 
 function selectFighter(id) {
   selected = id;
@@ -166,7 +167,8 @@ function startMatch() {
   menu.hidden = true;
   match.hidden = false;
   $("result").hidden = true;
-  $("exit").focus();
+  window.scrollTo(0, 0);
+  $("exit").focus({ preventScroll: true });
   pause = false;
   $("pause").disabled = false;
   $("pause").textContent = "Pause";
@@ -188,6 +190,7 @@ function exitMatch() {
 }
 function finishRound(winner, reason) {
   if (winner) winner.wins++;
+  clearInput();
   phase = "between";
   phaseTime = 2.15;
   setBanner(reason);
@@ -443,6 +446,12 @@ function clearInput() {
   updatePad();
 }
 
+function pauseForInterruption() {
+  pausedForHelp = false;
+  if (pause || phase === "menu" || phase === "result") clearInput();
+  else togglePause();
+}
+
 window.addEventListener("keydown", event => {
   if (phase === "menu" || controls.open || event.altKey || event.metaKey || event.ctrlKey) return;
   if (event.code === "Escape" && !event.repeat) togglePause();
@@ -450,6 +459,7 @@ window.addEventListener("keydown", event => {
   if (phase === "result" || !fightKeys.has(code)) return;
   if (code === "Space" && event.target.closest("button") && event.target !== $("exit") && event.target.dataset.key === undefined) return;
   event.preventDefault();
+  if (pause || phase === "between") return;
   if (!event.repeat) queueAttack(code);
   pressed.add(code);
   updatePad();
@@ -460,25 +470,28 @@ window.addEventListener("keyup", event => {
 });
 window.addEventListener("blur", clearInput);
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden && !pause) togglePause();
+  if (document.hidden) pauseForInterruption();
 });
+window.matchMedia("(orientation: landscape)").addEventListener("change", pauseForInterruption);
 for (const button of pad) {
   const code = button.dataset.key;
   button.addEventListener("pointerdown", event => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || pause || controls.open || (phase !== "ready" && phase !== "fight")) return;
     event.preventDefault();
     button.setPointerCapture(event.pointerId);
     pointerKeys.set(event.pointerId, code);
     queueAttack(code);
     updatePad();
   });
-  const release = event => {
+  button.addEventListener("pointerup", event => {
     pointerKeys.delete(event.pointerId);
     updatePad();
+  });
+  const cancelPointer = event => {
+    if (pointerKeys.has(event.pointerId)) clearInput();
   };
-  button.addEventListener("pointerup", release);
-  button.addEventListener("pointercancel", release);
-  button.addEventListener("lostpointercapture", release);
+  button.addEventListener("pointercancel", cancelPointer);
+  button.addEventListener("lostpointercapture", cancelPointer);
 }
 for (const card of cards) card.addEventListener("click", () => selectFighter(Number(card.dataset.fighter)));
 rival.addEventListener("change", () => { enemy = Number(rival.value); });
@@ -493,7 +506,6 @@ $("sound").addEventListener("click", () => {
   unlockAudio();
   updateSound();
 });
-let pausedForHelp = false;
 $("help").addEventListener("click", () => {
   pausedForHelp = !pause && ["ready", "fight", "between"].includes(phase);
   if (pausedForHelp) togglePause();
