@@ -15,21 +15,21 @@ All three milestones use the existing roster, Foundry arena, and offline browser
 ### Player flow
 
 1. Open the GitHub Pages build on a phone and pick a fighter and CPU rival in either orientation. On portrait touch screens, show a short **Rotate for landscape play** hint.
-2. Start a match in landscape. Use a left-thumb directional pad for movement and sidesteps and a right-thumb cluster for **Strike**, **Heavy**, **Special**, and **Guard**. Keep the special cooldown visible on its button.
-3. Hold a direction while tapping an attack or holding Guard. To direct Gemini’s Parallax, hold **↑** or **↓** with the left thumb and tap **Special** with the right.
+2. Start a match in landscape. Drag the left thumbstick to move and sidestep in any direction. Movement gets faster farther from the center and stops on release. Use the right-thumb cluster for **Strike**, **Heavy**, **Special**, and **Guard**.
+3. Hold the thumbstick off center while tapping an attack or holding Guard. To direct Gemini’s Parallax, push the stick up or down and tap **Special** with the other thumb. Keep the special cooldown visible on its button.
 4. Keep **Pause**, **Resume**, **Fighter Select**, and **Rematch** reachable by touch. If the phone rotates during a fight, clear held inputs and pause. Let the player resume explicitly when ready.
 
 ### Implementation order
 
-1. In [index.html](../index.html) and [style.css](../style.css), rearrange the existing on-screen buttons into two thumb clusters for short landscape viewports with touch input. Keep tap targets at least 44 × 44 CSS pixels. Reserve space for the clusters so neither covers the health bars, timer, or normal fighting area.
+1. In [index.html](../index.html) and [style.css](../style.css), place the thumbstick and combat buttons beside the arena in short landscape viewports with touch input. Keep tap targets at least 44 × 44 CSS pixels. Reserve space for the controls so neither covers the health bars, timer, or normal fighting area.
 2. Fit the match to the usable viewport height, including browser bars and safe-area insets on both sides. Reduce vertical spacing in the match header and HUD as needed. Keep fighter select and the Controls dialog scrollable. Preserve playback in the browser without requiring fullscreen or orientation lock.
-3. In [game.js](../game.js), build on the existing per-pointer bookkeeping and shared keyboard/touch action map. Confirm that a second touch leaves the first active and releasing one pointer affects only its action. Clear active inputs and the attack queue on cancellation, orientation changes, pause, focus loss, and match transitions. Limit gesture suppression to the controls.
+3. In [game.js](../game.js), capture one pointer for the thumbstick and convert its offset into a movement vector with a central dead zone and a capped outer range. Reuse the keyboard movement and combat logic. A second touch can operate combat independently. Clear active inputs and the attack queue on cancellation, orientation changes, pause, focus loss, and match transitions. Limit gesture suppression to the controls.
 4. Update the Controls dialog and README with the landscape layout and Gemini’s two-thumb input. Publish the mobile alpha and test the same build on GitHub Pages.
 
 ### Acceptance checks
 
 - On a physical iPhone in Safari and an Android phone in Chrome, play from fighter select through a match result and rematch without a keyboard. Use browser bars in their expanded and collapsed states. At a compact landscape size such as 568 × 320 CSS pixels, verify that the arena, HUD, and touch controls fit without scrolling during combat.
-- Hold movement while tapping each attack, hold Guard and release it, and trigger Parallax in both directions. Lift one thumb while the other is held and verify the remaining input stays active.
+- Drag around the full circle to verify diagonal movement, the central dead zone, the speed range, and recentering on release. Hold movement while tapping each attack, hold Guard and release it, and trigger Parallax in both directions. Lift one thumb while the other is held and verify the remaining input stays active.
 - Start a held input, then rotate, switch apps, or pause. Return and verify there is no stuck movement, guard, or queued strike. Check that browser scrolling still works in the roster and Controls dialog.
 - Verify the desktop layout and arrow, A/S/D, Space, and Esc bindings still behave as in alpha.1.
 

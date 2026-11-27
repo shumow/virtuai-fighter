@@ -28,9 +28,9 @@ If you already have this repository checked out, open `index.html` from the chec
 | **Space** | Hold to guard |
 | **Esc** | Pause or resume |
 
-On the alpha.2 build, turn your phone to landscape. Use the directional pad with your left thumb and tap **Strike**, **Heavy**, or **Special** with your right. Hold **Guard** to block. Rotating the phone during a fight pauses it until you tap **Resume**.
+On the alpha.2 build, turn your phone to landscape. Drag the left thumbstick to move or sidestep. Drag farther from the center to move faster, and lift your thumb to stop. Tap **Strike**, **Heavy**, or **Special** with your right thumb, or hold **Guard** to block. Rotating the phone during a fight pauses it until you tap **Resume**.
 
-As Gemini, hold **↑** or **↓** while pressing **D** or tapping **Special** to choose the direction of Parallax’s sidestep.
+As Gemini, hold **↑** or **↓** while pressing **D** to direct Parallax. On a phone, push the thumbstick up or down while tapping **Special**.
 
 ## Win the match
 

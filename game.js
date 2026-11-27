@@ -27,6 +27,8 @@ const specialButton = $("special");
 const specialCooldown = 2.6;
 const pressed = new Set();
 const pointerKeys = new Map();
+const thumbstick = $("thumbstick");
+const stick = { pointer: null, x: 0, z: 0 };
 const stored = { get(key) { try { return localStorage.getItem(key); } catch { return null; } },
   set(key, value) { try { localStorage.setItem(key, value); } catch { /* Storage can be disabled. */ } } };
 
@@ -268,11 +270,12 @@ function held(code) {
 }
 function playerTick(fighter, opponent, dt) {
   fighter.guard = held("Space") && !fighter.attack && fighter.stun <= 0;
-  const x = Number(held("ArrowRight")) - Number(held("ArrowLeft"));
-  const z = Number(held("ArrowDown")) - Number(held("ArrowUp"));
+  const x = stick.pointer === null ? Number(held("ArrowRight")) - Number(held("ArrowLeft")) : stick.x;
+  const z = stick.pointer === null ? Number(held("ArrowDown")) - Number(held("ArrowUp")) : stick.z;
   move(fighter, x, z, dt);
   if (queued && worldTime > queued.expires) queued = null;
-  if (queued && beginAttack(fighter, queued.kind, opponent, z)) queued = null;
+  const step = Math.abs(z) >= .18 ? z : 0;
+  if (queued && beginAttack(fighter, queued.kind, opponent, step)) queued = null;
 }
 function cpuTick(cpu, player, dt) {
   const direction = distance(cpu, player);
@@ -439,10 +442,40 @@ function frame(now) {
 function queueAttack(code) {
   if (buttons[code] && phase === "fight" && !pause) queued = { kind: buttons[code], expires: worldTime + .16 };
 }
+function updateStick(event) {
+  const { left, top, width, height } = thumbstick.getBoundingClientRect();
+  const radius = Math.min(width, height) / 2;
+  if (!radius) {
+    releaseStick();
+    return;
+  }
+  const dx = (event.clientX - left - width / 2) / radius;
+  const dz = (event.clientY - top - height / 2) / radius;
+  const distance = Math.hypot(dx, dz);
+  const deadZone = .16;
+  const strength = Math.max(0, (Math.min(1, distance) - deadZone) / (1 - deadZone));
+  stick.x = distance ? dx * strength / distance : 0;
+  stick.z = distance ? dz * strength / distance : 0;
+  const travel = radius * .54 / Math.max(1, distance);
+  thumbstick.style.setProperty("--stick-x", dx * travel + "px");
+  thumbstick.style.setProperty("--stick-y", dz * travel + "px");
+}
+function releaseStick() {
+  if (stick.pointer === null) return;
+  const id = stick.pointer;
+  stick.pointer = null;
+  stick.x = 0;
+  stick.z = 0;
+  thumbstick.classList.remove("active");
+  thumbstick.style.removeProperty("--stick-x");
+  thumbstick.style.removeProperty("--stick-y");
+  if (thumbstick.hasPointerCapture(id)) thumbstick.releasePointerCapture(id);
+}
 function clearInput() {
   pressed.clear();
   pointerKeys.clear();
   queued = null;
+  releaseStick();
   updatePad();
 }
 
@@ -473,10 +506,34 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) pauseForInterruption();
 });
 window.matchMedia("(orientation: landscape)").addEventListener("change", pauseForInterruption);
+function canUseTouch(event) {
+  return event.button === 0 && !pause && !controls.open && (phase === "ready" || phase === "fight");
+}
+
+thumbstick.addEventListener("pointerdown", event => {
+  if (stick.pointer !== null || !canUseTouch(event)) return;
+  event.preventDefault();
+  thumbstick.setPointerCapture(event.pointerId);
+  stick.pointer = event.pointerId;
+  thumbstick.classList.add("active");
+  updateStick(event);
+});
+thumbstick.addEventListener("pointermove", event => {
+  if (stick.pointer === event.pointerId) updateStick(event);
+});
+thumbstick.addEventListener("pointerup", event => {
+  if (stick.pointer === event.pointerId) releaseStick();
+});
+const cancelStick = event => {
+  if (stick.pointer === event.pointerId) clearInput();
+};
+thumbstick.addEventListener("pointercancel", cancelStick);
+thumbstick.addEventListener("lostpointercapture", cancelStick);
+
 for (const button of pad) {
   const code = button.dataset.key;
   button.addEventListener("pointerdown", event => {
-    if (event.button !== 0 || pause || controls.open || (phase !== "ready" && phase !== "fight")) return;
+    if (!canUseTouch(event)) return;
     event.preventDefault();
     button.setPointerCapture(event.pointerId);
     pointerKeys.set(event.pointerId, code);

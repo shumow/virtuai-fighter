@@ -144,6 +144,7 @@ footer { margin: 25px 0 0; padding: 15px 0; display: flex; justify-content: spac
 }
 .result h2 { font-size: clamp(30px, 7vw, 72px) }
 .fight-controls { margin-top: 13px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px }
+.thumbstick { display: none }
 .pad { display: flex; gap: 5px }
 .pad button { min-width: 36px; padding: 7px; min-height: 39px; border: 1px solid var(--line); background: #1b211e; touch-action: none; font: 12px var(--mono); user-select: none; -webkit-touch-callout: none }
 .pad button.active { color: #101914; background: var(--mint) }
@@ -205,6 +206,7 @@ dialog p { color: var(--muted); margin: 18px 0 0; font-size: 13px }
   .match {
     --control: clamp(44px, min(7.4vw, 15vh), 60px);
     --control: clamp(44px, min(7.4vw, 15dvh), 60px);
+    --stick-size: calc(2.8 * var(--control));
     --gutter: 4px;
     display: grid;
     grid-template: auto minmax(0, 1fr) / auto minmax(0, 1fr) auto;
@@ -212,7 +214,7 @@ dialog p { color: var(--muted); margin: 18px 0 0; font-size: 13px }
     width: min(1180px, 100%);
     height: calc(100vh - 45px - var(--safe-top) - var(--safe-bottom));
     height: calc(100dvh - 45px - var(--safe-top) - var(--safe-bottom));
-    min-height: calc(45px + 3 * var(--control) + 2 * var(--gutter) + 4px);
+    min-height: calc(45px + var(--stick-size) + 4px);
     padding: 0 max(8px, var(--safe-right)) 4px max(8px, var(--safe-left));
   }
   .stage-head { grid-area: 1 / 1 / 2 / -1; margin: 0; min-width: 0 }
@@ -238,17 +240,34 @@ dialog p { color: var(--muted); margin: 18px 0 0; font-size: 13px }
     align-self: end;
   }
   .pad button { min-width: 0; min-height: var(--control); padding: 3px; border-radius: 5px }
-  .movement {
+  .movement { display: none }
+  .thumbstick {
     grid-area: 2 / 1;
-    grid-template-areas: ". up ." "left . right" ". down .";
-    grid-template-columns: repeat(3, var(--control));
-    grid-template-rows: repeat(3, var(--control));
+    display: block;
+    position: relative;
+    width: var(--stick-size);
+    height: var(--stick-size);
+    align-self: end;
+    border: 1px solid #51695d;
+    border-radius: 50%;
+    background: radial-gradient(circle, #25352d 0 47%, #51695d 48% 49%, #171f1b 50%);
+    touch-action: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
-  .movement button { font-size: 21px }
-  .movement button[data-key="ArrowUp"] { grid-area: up }
-  .movement button[data-key="ArrowLeft"] { grid-area: left }
-  .movement button[data-key="ArrowRight"] { grid-area: right }
-  .movement button[data-key="ArrowDown"] { grid-area: down }
+  .thumbstick-knob {
+    position: absolute;
+    width: 44%;
+    height: 44%;
+    left: calc(50% + var(--stick-x, 0px));
+    top: calc(50% + var(--stick-y, 0px));
+    transform: translate(-50%, -50%);
+    border: 1px solid var(--mint);
+    border-radius: 50%;
+    background: #365b49;
+    pointer-events: none;
+  }
+  .thumbstick.active .thumbstick-knob { background: var(--mint) }
   .actions { grid-area: 2 / 3; grid-template-columns: repeat(2, max(46px, var(--control))); margin-bottom: 9px }
   .actions button { font-size: 10px; font-weight: 700 }
   .actions kbd { display: none }
